@@ -1,0 +1,128 @@
+<html>
+    <head>
+            {% load static %}
+            <link rel="stylesheet" href="{% static 'mainapp/style.css' %}" type="text/css">
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+            
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">        
+    </head>
+    <div class="jumbotron">
+        
+            <nav class="navbar-light">
+                    {% if user.is_authenticated %}
+                        <a class="nav-item"><a href="/gmailAuthenticate" class="btn btn-outline-primary" onclick="gmailAuthenticate()" title="gmailAuthenticate">Mails</a></a>
+                        <a class="nav-item"><a href="/dashboard" class="btn btn-outline-primary" onclick="dashboard()" title="dashboard">Dashboard</a></a>
+                        <a class="nav-item"><a href="/account/logout" class="btn btn-outline-primary">Logout</a></a>
+                    {% else %}
+                        <a class="nav-item"><a href={% url "social:begin" "google-oauth2" %} class="btn btn-outline-primary">Login with Google</a></a>
+    
+                    {% endif %}
+            </nav>
+            
+            <div class="jumbotron-fluid">
+            {% if user.is_authenticated %}
+                <p></p>
+                <!--
+                    <li>get_short_name: {{ user.get_short_name }}</li>
+                    <li>get_short_name: {{ user.get_full_name }}</li>
+                    <li>user.username: {{ user.username }}</li>
+                    <li>user.email: {{ user.email }}</li>
+                    <li>user.password: {{ user.password }}</li>
+                    <li>user.get_group_permissions: {{ user.get_group_permissions }}</li>
+                    <li>user.get_all_permissions: {{ user.get_all_permissions }}</li>
+                    <li>access_token: {{ access_token }}</li>
+                -->
+                {% if status and mailswant %}
+                <div class="container">
+                    {% for data in messageslist %}
+                    <div id="accordion" role="tablist">
+                        <div class="card">
+                            <h5 class="card-header">{{ data.from }}</h5>
+                            <div class="card-body" data-toggle="collapse" href="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                                <h5 class="card-title">{{ data.subject }}</h5>
+                                <p class="card-text">{{ data.snippet }}</p>
+                                {% if data.html is not None%}
+                                <div class="collapse" id="collapse{{ forloop.counter }}" data-parent="#accordion">
+                                    <div class="card card-body"><iframe src="data:text/html;charset=utf-8;base64,{{ data.html }}" ></iframe></div>
+                                </div>
+                                {% elif data.text is not None %}
+                                <div class="collapse" id="collapse{{ forloop.counter }}" data-parent="#accordion" role="tabpanel">
+                                        <div class="card card-body"><iframe src="data:text/html;charset=utf-8;base64,{{ data.text }}" ></iframe></div>
+                                </div>
+                                {% endif %}
+                                <div class="card-footer text-muted">{{ data.date }}</div>
+                                
+                            </div>
+                        </div>   
+                    </div>
+                    <br>
+                    {% endfor %}
+                        
+                        
+                </div>
+
+                {% elif status and dashboardwant %}
+                <div class="card-columns">
+                    {% for article in articleslist %}
+                        <div class="card">
+                            <div class="card-header">{{ article.query }}</div>
+                            {% if article.imgurl is not None %}
+                            <img src="{{ article.imgurl }}" class="card-img-top" alt="no image" onerror="this.src='https://www.library.unsw.edu.au/sites/default/files/images/content-page/Content-image---newspapers_0.jpg';">
+                            {% endif %}
+                            <div class="card-body"><h5 class="card-title">{{ article.title }}</h5><div class="card-text">{{ article.content }}</div></div>
+                            <div class="card-body"><a href="{{ article.url }}" class="card-link">{{ article.source }}</a></div>
+                            <div class="card-footer text-muted">{{ article.date }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <h2 class="display-4">Hello, {{ user.get_short_name }}</h2>
+                {% endif %}
+                        <!--
+                        <div>
+                            <li>subject: {{ data.subject }}</li>
+                            <li>from: {{ data.from }}</li>
+                            <li>snippet: {{ data.snippet }}</li>
+                            <li>date: {{ data.date }}</li>
+                            {% if bools.html %}
+                                <li><iframe src="data:text/html;charset=utf-8;base64,{{ data.html }}"></iframe></li>
+                            {% endif %}
+                            {% if bools.text %}
+                                <li><iframe src="data:text/html;charset=utf-8;base64,{{ data.text }}"></iframe></li>
+                            {% endif %}
+                        </div>
+                        <br>
+
+                        <div class="card-columns">
+                    {% for data in messageslist %}
+                        <div class="card">
+                                <div class="card-header">{{ data.subject }}</div>
+                                <div class="card-footer text-muted">{{ data.from }}</div>
+                                {% if data.html is not None%}
+                                    <div class="card-body"><iframe src="data:text/html;charset=utf-8;base64,{{ data.html }}" ></iframe></div>
+                                {% elif data.text is not None %}
+                                    <div class="card-body"><iframe src="data:text/html;charset=utf-8;base64,{{ data.text }}" ></iframe></div>
+                                {% else %}
+                                    <div class="card-body">{{ data.snippet }}</div>
+                                {% endif %}
+                                <div class="card-footer text-muted">{{ data.date }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                        -->
+                        
+                    
+                
+            {% else %}
+                <div>
+                    <br><br>
+                    <h3 class="display-6">It's cold in here</h3>
+                </div>
+            {% endif %}
+    </div>
+
+</div>
+</body>
+</html>
