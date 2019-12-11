@@ -91,8 +91,8 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'snowflake',
         'HOST': 'mongodb://vruksha:omongodb2015@cluster0-shard-00-00-bs91f.mongodb.net:27017,cluster0-shard-00-01-bs91f.mongodb.net:27017,cluster0-shard-00-02-bs91f.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority',
-	    'USER': 'vruksha',
-	    'PASSWORD': '0mongodb2015',
+	    'USER': 'userid',
+	    'PASSWORD': *password*,
     }
 }
 
